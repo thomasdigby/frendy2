@@ -1,0 +1,18 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head prefix="og: http://ogp.me/ns">
+    {% include html-head.html %}
+  </head>
+  <body class="site">
+
+    {% include site-header.html %}
+
+    <main class="site-main">
+      {{ content }}
+    </main>
+
+    {% include site-footer.html %}
+    {% include site-analytics.html %}
+    <script>loadJS('/public/{{site.data.stats.js.main}}')</script>
+  </body>
+</html>

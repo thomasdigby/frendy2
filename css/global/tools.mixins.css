@@ -1,0 +1,26 @@
+
+/*  Fancy underlines */
+/*  ----------------------------------- */
+@mixin underline($foreground-color, $background-color: #fff, $offset: 1.125em, $weight: 1px) {
+  background-image: linear-gradient(to left, $foreground-color 50%, $foreground-color 50%);
+  background-position: 0 $offset;
+  background-repeat: repeat-x;
+  background-size: 1px $weight;
+  text-decoration: none;
+  /* text-shadow in all directions twice then outwards horizontally three times more (it works alright) */
+  text-shadow:
+    0.03em 0 $background-color,
+    -0.03em 0 $background-color,
+    0 0.03em $background-color,
+    0 -0.03em $background-color,
+    0.06em 0 $background-color,
+    -0.06em 0 $background-color,
+    0 0.06em $background-color,
+    0 -0.06em $background-color,
+    0.09em 0 $background-color,
+    -0.09em 0 $background-color,
+    0.12em 0 $background-color,
+    -0.12em 0 $background-color,
+    0.15em 0 $background-color,
+    -0.15em 0 $background-color;
+}

@@ -1,0 +1,29 @@
+# Site settings
+title: Frend
+email: hello@frend.co
+description: A collection of accessible, modern front‑end components
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "https://frend.co" # the base hostname & protocol for your site
+enforce_ssl: frend.co   # without any protocol
+
+# Build settings
+markdown: kramdown
+
+kramdown:
+  syntax_highlighter: rouge
+
+exclude: [node_modules, package.json, npm-debug.log, .babelrc, gulpfile.js, webpack.config.js, css/*.scss]
+
+collections:
+  components:
+    output: true
+
+gems:
+  - jekyll-redirect-from
+
+defaults:
+  - scope:
+      type: components
+    values:
+      layout: component
+      permalink: components/:name

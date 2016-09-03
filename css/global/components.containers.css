@@ -1,0 +1,34 @@
+
+.site {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.site-main {
+  flex: 1 0 auto;
+  padding-bottom: 3.5rem; /* 56px */
+}
+
+.wrapper {
+  margin: 0 auto;
+  max-width: 37.5rem; /* 600px */
+  padding: 0 1.25rem; /* 20px */
+  width: 100%;
+  @media (min-width: $lap) {
+    max-width: 80%;
+  }
+  @media (min-width: $desk) {
+    max-width: 42.5rem; /* 680px */
+  }
+}
+
+.content-header {
+  margin: 4.5rem 0 2.5rem; /* 72px 0 40px */
+  @media (min-width: $lap) {
+    margin-top: 6rem; /* 96px */
+  }
+}
+.content-footer {
+  margin: 3.5rem 0; /* 56px */
+}
