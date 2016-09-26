@@ -2,13 +2,7 @@
   "rules": {
     "comma-dangle": ["error", "never"],
     "semi": ["error", "never"],
-    "consistent-return": 0,
-    "import/no-unresolved": [2, {
-      "ignore": [".css"]
-    }],
-    "import/no-extraneous-dependencies": ["error", {
-      "devDependencies": true
-    }]
+    "consistent-return": 0
   },
   "env": {
     "es6": true,
