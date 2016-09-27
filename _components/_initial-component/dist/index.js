@@ -4,35 +4,74 @@
   (global.frinitial = factory());
 }(this, (function () { 'use strict';
 
-var nodelistArray = (function (el) {
-  var ctx = arguments.length <= 1 || arguments[1] === undefined ? document : arguments[1];
-  return [].slice.call(ctx.querySelectorAll(el));
+var defer = (function (fn) {
+  //  defers invoking the function until the current call stack has cleared
+  if (typeof fn === 'function') setTimeout(fn, 0);
 });
 
-function frinitial() {
-  var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+function emitter() {
+  var object = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-  var _ref$selector = _ref.selector;
-  var selector = _ref$selector === undefined ? '' : _ref$selector;
+  var events = {};
+
+  function on(name, handler) {
+    events[name] = events[name] || [];
+    events[name].push(handler);
+    // console.log(events);
+    return this;
+  }
+
+  function emit(name) {
+    var _this = this;
+
+    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    // console.log(events);
+    var evt = events[name];
+    if (!evt) {
+      return;
+    }
+    evt.forEach(function (handler) {
+      handler.apply(_this, args);
+    });
+    return this;
+  }
+
+  return Object.assign(object, {
+    on: on,
+    emit: emit
+  });
+}
+
+function frinitial(el) {
+  var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
   var _ref$readyClass = _ref.readyClass;
   var readyClass = _ref$readyClass === undefined ? '' : _ref$readyClass;
 
   // supports
   if (!('querySelector' in document) || !('addEventListener' in window) || !document.documentElement.classList) return;
-  // element
-  var el = nodelistArray(selector)[0];
+  var wrappedEmitter = {};
   // public functions
   function destroy() {
     el.classList.remove(readyClass);
   }
   function init() {
-    console.log(el);
-    if (!el.length) return;
+    if (!el) return;
     el.classList.add(readyClass);
+    defer(function () {
+      return wrappedEmitter.emit('test');
+    });
   }
+  wrappedEmitter = emitter({
+    init: init,
+    destroy: destroy
+  });
   init();
   // expose public functions
-  return { init: init, destroy: destroy };
+  return wrappedEmitter;
 }
 
 return frinitial;
