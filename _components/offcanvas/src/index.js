@@ -1,4 +1,4 @@
-import { q, defer, emitter } from 'frend-utils'
+import { q, defer, closest, emitter } from 'frend-utils'
 
 export default function froffcanvas(el, {
     openSelector: openSelector = '.js-fr-offcanvas-open',
@@ -15,6 +15,7 @@ export default function froffcanvas(el, {
   ) return
 
   const openButtons = q(`[aria-controls="${el.getAttribute('id')}"]`)
+  let currentOpen = {}
 
   // wrap function in event emitter
   const wrappedEmitter = emitter({
@@ -42,7 +43,11 @@ export default function froffcanvas(el, {
     el.setAttribute('aria-hidden', false)
     el.setAttribute('tabindex', -1)
     el.focus()
-    // bind necessary events
+    // unbind open click
+    defer(_unbindOpenClick)
+    // bind other events
+    defer(_bindDocKey)
+    defer(_bindDocClick)
     defer(_bindCloseClick)
     // reset scroll position
     el.scrollTop = 0
@@ -58,18 +63,35 @@ export default function froffcanvas(el, {
     el.setAttribute('aria-hidden', true)
     el.removeAttribute('tabindex')
     el.blur()
+    // unbind other events
+    _unbindDocKey()
+    _unbindDocClick()
+    _unbindCloseClick()
+    _bindOpenClick()
     // add active class
     el.classList.remove(activeClass)
     // emit event
     wrappedEmitter.emit('hide')
+    if (currentOpen) currentOpen.focus()
   }
 
   // events
-  function _handleOpenClick() {
+  function _handleOpenClick(e) {
+    currentOpen = e.currentTarget
     _showPanel()
   }
   function _handleCloseClick() {
     _hidePanel()
+  }
+  function _handleDocClick(e) {
+    //  check if target is panel or child of
+    if (
+      e.target !== el &&
+      !closest(e.target, `#${el.getAttribute('id')}`)
+    ) _hidePanel()
+  }
+  function _handleDocKey(e) {
+    if (e.keyCode === 27) _hidePanel()
   }
 
   // bindings
@@ -79,15 +101,36 @@ export default function froffcanvas(el, {
   function _bindCloseClick() {
     q(closeSelector, el).forEach(button => button.addEventListener('click', _handleCloseClick))
   }
+  function _bindDocClick() {
+    document.addEventListener('click', _handleDocClick)
+  }
+  function _bindDocKey() {
+    document.addEventListener('keydown', _handleDocKey)
+  }
+
   function _unbindOpenClick() {
     openButtons.forEach(button => button.removeEventListener('click', _handleOpenClick))
+  }
+  function _unbindCloseClick() {
+    q(closeSelector, el).forEach(button => button.removeEventListener('click', _handleCloseClick))
+  }
+  function _unbindDocClick() {
+    document.removeEventListener('click', _handleDocClick)
+  }
+  function _unbindDocKey() {
+    document.removeEventListener('keydown', _handleDocKey)
   }
 
   function destroy() {
     // undo init() work and any extras
     _removeA11y()
     _unbindOpenClick()
+    _unbindDocKey()
+    _unbindDocClick()
+    _unbindCloseClick()
+    el.classList.remove(activeClass)
     el.classList.remove(readyClass)
+    el.style.visibility = ''
   }
   function init() {
     // detect existence of element on page
