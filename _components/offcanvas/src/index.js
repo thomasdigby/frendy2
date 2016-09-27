@@ -1,7 +1,6 @@
 import { q, defer, closest, emitter } from 'frend-utils'
 
 export default function froffcanvas(el, {
-    openSelector: openSelector = '.js-fr-offcanvas-open',
     closeSelector: closeSelector = '.js-fr-offcanvas-close',
     readyClass: readyClass = 'fr-offcanvas--is-ready',
     activeClass: activeClass = 'fr-offcanvas--is-active'
@@ -15,12 +14,14 @@ export default function froffcanvas(el, {
   ) return
 
   const openButtons = q(`[aria-controls="${el.getAttribute('id')}"]`)
-  let currentOpen = {}
+  let currentOpen = null
 
   // wrap function in event emitter
   const wrappedEmitter = emitter({
     init,
-    destroy
+    destroy,
+    show,
+    hide
   })
 
   // run component and return to callee
@@ -72,7 +73,10 @@ export default function froffcanvas(el, {
     el.classList.remove(activeClass)
     // emit event
     wrappedEmitter.emit('hide')
-    if (currentOpen) currentOpen.focus()
+    if (currentOpen) {
+      currentOpen.focus()
+      currentOpen = null
+    }
   }
 
   // events
@@ -108,6 +112,7 @@ export default function froffcanvas(el, {
     document.addEventListener('keydown', _handleDocKey)
   }
 
+  // unbindings?
   function _unbindOpenClick() {
     openButtons.forEach(button => button.removeEventListener('click', _handleOpenClick))
   }
@@ -121,6 +126,7 @@ export default function froffcanvas(el, {
     document.removeEventListener('keydown', _handleDocKey)
   }
 
+  // public
   function destroy() {
     // undo init() work and any extras
     _removeA11y()
@@ -131,6 +137,7 @@ export default function froffcanvas(el, {
     el.classList.remove(activeClass)
     el.classList.remove(readyClass)
     el.style.visibility = ''
+    currentOpen = null
   }
   function init() {
     // detect existence of element on page
@@ -142,5 +149,11 @@ export default function froffcanvas(el, {
     el.classList.add(readyClass)
     // emit event
     defer(() => wrappedEmitter.emit('init'))
+  }
+  function show() {
+    _showPanel()
+  }
+  function hide() {
+    _hidePanel()
   }
 }
