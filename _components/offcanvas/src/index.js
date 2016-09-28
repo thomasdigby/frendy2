@@ -1,4 +1,4 @@
-import { q, defer, closest, emitter } from 'frend-utils'
+import { q, emitter, defer, closest } from 'frend-utils'
 
 export default function froffcanvas(el, {
     closeSelector: closeSelector = '.js-fr-offcanvas-close',
@@ -21,7 +21,8 @@ export default function froffcanvas(el, {
     init,
     destroy,
     show,
-    hide
+    hide,
+    isOpen: false
   })
 
   // run component and return to callee
@@ -55,9 +56,10 @@ export default function froffcanvas(el, {
     // add active class
     el.classList.add(activeClass)
     // emit event
+    wrappedEmitter.isOpen = true
     wrappedEmitter.emit('show')
   }
-  function _hidePanel() {
+  function _hidePanel(elToFocus = currentOpen) {
     // set visibility to override any previous set style
     el.style.visibility = 'hidden'
     // remove aria-hidden, add focus
@@ -72,10 +74,11 @@ export default function froffcanvas(el, {
     // add active class
     el.classList.remove(activeClass)
     // emit event
+    wrappedEmitter.isOpen = false
     wrappedEmitter.emit('hide')
-    if (currentOpen) {
-      currentOpen.focus()
-      currentOpen = null
+    if (elToFocus) {
+      elToFocus.focus()
+      elToFocus = null
     }
   }
 
@@ -153,7 +156,7 @@ export default function froffcanvas(el, {
   function show() {
     _showPanel()
   }
-  function hide() {
-    _hidePanel()
+  function hide(elToFocus) {
+    _hidePanel(elToFocus)
   }
 }
